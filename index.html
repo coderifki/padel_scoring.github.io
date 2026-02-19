@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Padel Social Pro v6.9</title>
+    <title>Padel Social Pro v7.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -13,7 +13,6 @@
             text-align: center; font-size: 1.75rem; font-weight: 800; width: 70px; height: 60px;
             border-radius: 0.5rem; border: 2px solid #e5e7eb; background: #fff; transition: all 0.2s;
         }
-        .score-input:disabled { background-color: #f9fafb; color: #9ca3af; }
         .score-input:focus { border-color: #3b82f6; ring: 2px; outline: none; }
         .tab-btn { padding: 12px; border-bottom: 3px solid transparent; color: #6b7280; font-weight: 600; flex: 1; transition: all 0.2s; }
         .tab-btn.active { border-bottom-color: #2563eb; color: #2563eb; background: #eff6ff; }
@@ -21,13 +20,14 @@
         .nav-pill.active { background: white; color: #1e3a8a; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .nav-pill.inactive { color: rgba(255,255,255,0.7); }
         .hidden { display: none !important; }
+        .skipped-card { background-color: #f3f4f6; border-color: #d1d5db; opacity: 0.7; }
     </style>
 </head>
 <body class="text-gray-800 pb-24">
 
     <header class="bg-blue-900 text-white p-4 shadow-lg sticky top-0 z-50">
         <div class="max-w-6xl mx-auto flex justify-between items-center mb-4">
-            <h1 class="text-xl font-bold flex items-center gap-2">🎾 Padel Social Pro <span class="text-xs opacity-50">v6.9</span></h1>
+            <h1 class="text-xl font-bold flex items-center gap-2">🎾 Padel Social Pro <span class="text-xs opacity-50">v7.0</span></h1>
             <div class="flex gap-2">
                 <button onclick="exportData()" class="text-xs bg-blue-700 hover:bg-blue-600 px-3 py-1 rounded shadow">Save JSON</button>
                 <button onclick="resetApp()" class="text-xs bg-red-500 hover:bg-red-600 px-3 py-1 rounded shadow">Reset App</button>
@@ -56,7 +56,7 @@
                     <div class="col-span-1 md:col-span-1">
                         <label class="block font-semibold mb-1 text-sm text-blue-900">Rotation Logic</label>
                         <select id="pairingLogicSelect" class="w-full p-2 border rounded-lg bg-white h-10">
-                            <option value="americano">Americano (Random)</option>
+                            <option value="americano">Americano (Balanced)</option>
                             <option value="mexicano">Mexicano (Ladder)</option>
                         </select>
                     </div>
@@ -86,11 +86,11 @@
 
             <div id="active-screen" class="hidden space-y-6">
                 <div class="bg-white p-3 rounded-xl shadow-sm flex justify-between items-center sticky top-20 z-40 border border-gray-100">
-                    <button onclick="changeRound(-1)" class="p-2 rounded-lg text-gray-500 disabled:opacity-30 hover:bg-gray-100">« Prev</button>
+                    <button onclick="changeRound(-1)" id="prevRoundBtn" class="p-2 rounded-lg text-gray-500 disabled:opacity-30 hover:bg-gray-100">« Prev</button>
                     <div class="text-center">
                         <h2 class="text-xl font-black text-gray-800">ROUND <span id="socialRoundNumDisplay" class="text-blue-600">1</span></h2>
                     </div>
-                    <button onclick="generateNextRound()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700">Next Round »</button>
+                    <button onclick="generateNextRound()" id="nextRoundBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700">Next Round »</button>
                 </div>
                 <div id="matches-container" class="grid lg:grid-cols-2 gap-4"></div>
                 <div class="bg-white rounded-xl shadow border overflow-hidden">
@@ -166,19 +166,19 @@
         // --- GLOBAL STATE ---
         let socialStyle = 'individual';
         let socialPlayers = [], roundsHistory = [], currentRoundIndex = 0;
-        let tournData = { round: 0, groups: [], bracket: [], finalMatch: null };
+        let tournData = { round: 0, groups: [], bracket: [], finalMatch: null, format: 'fixed', qualifiersPerGroup: 2 };
         let pointsCap = 21, totalCourts = 2, scoreType = 'fixed', currentPairingMode = 'americano';
-        let tournRoundIndex = 0; // NEW: Track Tournament Round View
+        let tournRoundIndex = 0;
 
         // --- PERSISTENCE ENGINE ---
         function saveState() {
             const state = { socialStyle, socialPlayers, roundsHistory, currentRoundIndex, tournData, scoreType, pointsCap, currentPairingMode, tournRoundIndex,
                 activeMode: document.getElementById('app-social').classList.contains('hidden') ? 'tournament' : 'social' };
-            localStorage.setItem('padelPro_v6.9', JSON.stringify(state));
+            localStorage.setItem('padelPro_v7.0', JSON.stringify(state));
         }
 
         function loadState() {
-            const saved = localStorage.getItem('padelPro_v6.9');
+            const saved = localStorage.getItem('padelPro_v7.0');
             if (!saved) { setSocialStyle('individual', document.querySelector('.tab-btn.active')); return; }
             const state = JSON.parse(saved);
             socialStyle = state.socialStyle; socialPlayers = state.socialPlayers; 
@@ -196,10 +196,7 @@
             } else if (state.activeMode === 'tournament' && tournData.groups.length > 0) {
                 document.getElementById('tourn-setup').classList.add('hidden');
                 document.getElementById('tourn-active').classList.remove('hidden');
-                // Ensure index is valid
-                if(tournData.groups[0].history.length > 0) {
-                    tournRoundIndex = Math.min(tournRoundIndex, tournData.groups[0].history.length - 1);
-                }
+                if(tournData.groups[0].history.length > 0) tournRoundIndex = Math.min(tournRoundIndex, tournData.groups[0].history.length - 1);
                 renderTournGroups();
                 if(tournData.bracket.length > 0) {
                     document.getElementById('phase-groups').classList.add('hidden');
@@ -222,7 +219,7 @@
             saveState();
         }
 
-        // --- SOCIAL MIXER (Same logic as v6.8) ---
+        // --- SOCIAL MIXER LOGIC ---
         function setSocialStyle(style, btn) {
             socialStyle = style;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -265,13 +262,20 @@
         function generateNextRound() {
             if (roundsHistory.length > 0) {
                 const unsubmitted = roundsHistory[currentRoundIndex].matches.filter(m => !m.submitted);
-                if (unsubmitted.length > 0) return alert("Finish all current matches first.");
+                if (unsubmitted.length > 0) return alert("Finish all matches first.");
             }
-            let pool = [...socialPlayers].sort(() => 0.5 - Math.random());
-            if(currentPairingMode === 'mexicano') {
-                const stats = calculateSocialStats();
+
+            // --- BALANCED PAIRING LOGIC ---
+            // 1. Calculate current play count for everyone
+            const stats = calculateSocialStats(); 
+            // 2. Sort pool: Least played go first
+            let pool = [...socialPlayers];
+            if(currentPairingMode === 'americano') {
+                pool.sort((a,b) => (stats[a.id].played - stats[b.id].played) || (0.5 - Math.random()));
+            } else { // Mexicano (Ladder)
                 pool.sort((a,b) => stats[b.id].pts - stats[a.id].pts);
             }
+            
             let matches = [];
             if(socialStyle === 'team') {
                 let b = pool.filter(p => p.team === 'Blue'), r = pool.filter(p => p.team === 'Red');
@@ -294,16 +298,23 @@
             data.matches.forEach((m, i) => {
                 const isSkipped = m.skipped;
                 const cardClass = isSkipped ? 'skipped-card rounded-xl border p-4' : `bg-white p-4 rounded-xl border ${m.submitted ? 'bg-green-50 border-green-400' : 'shadow-sm'}`;
-                const w1 = m.score1 > m.score2 ? 'text-blue-700 font-black' : 'text-gray-600';
-                const w2 = m.score2 > m.score1 ? 'text-red-700 font-black' : 'text-gray-600';
                 const inputState = isSkipped ? 'disabled' : '';
                 
+                let skipBtn = '';
+                // Enable Skip button only if not submitted yet
+                if(!m.submitted) {
+                    skipBtn = `<button onclick="skipSocialMatch(${i})" class="w-1/3 py-2 bg-gray-200 text-gray-500 rounded font-bold ml-2 hover:bg-gray-300">Skip</button>`;
+                } else if (m.skipped) {
+                    skipBtn = `<button onclick="skipSocialMatch(${i})" class="w-1/3 py-2 bg-gray-200 text-gray-500 rounded font-bold ml-2 hover:bg-gray-300">Restore</button>`;
+                }
+
                 container.innerHTML += `<div class="${cardClass} relative">
-                    ${isSkipped ? '<div class="absolute inset-0 flex items-center justify-center font-black text-gray-400 text-xl tracking-widest uppercase pointer-events-none">Match Skipped</div>' : ''}
-                    <div class="flex justify-between items-center mb-2"><span class="${w1} truncate w-32">${m.team1.map(p=>p.name).join(' & ')}</span><input type="number" ${inputState} class="w-16 border text-center font-bold text-xl rounded" value="${m.score1}" onchange="updateSocialScore(${i}, 1, this.value)"></div>
-                    <div class="flex justify-between items-center mb-4"><span class="${w2} truncate w-32">${m.team2.map(p=>p.name).join(' & ')}</span><input type="number" ${inputState} class="w-16 border text-center font-bold text-xl rounded" value="${m.score2}" onchange="updateSocialScore(${i}, 2, this.value)"></div>
+                    ${isSkipped ? '<div class="absolute inset-0 flex items-center justify-center font-black text-gray-400 text-xl tracking-widest uppercase pointer-events-none">Skipped</div>' : ''}
+                    <div class="flex justify-between items-center mb-2"><span class="truncate w-32 font-bold text-blue-800">${m.team1.map(p=>p.name).join(' & ')}</span><input type="number" ${inputState} class="w-16 border text-center font-bold text-xl rounded" value="${m.score1}" onchange="updateSocialScore(${i}, 1, this.value)"></div>
+                    <div class="flex justify-between items-center mb-4"><span class="truncate w-32 font-bold text-red-800">${m.team2.map(p=>p.name).join(' & ')}</span><input type="number" ${inputState} class="w-16 border text-center font-bold text-xl rounded" value="${m.score2}" onchange="updateSocialScore(${i}, 2, this.value)"></div>
                     <div class="flex">
-                        <button onclick="submitSocialMatch(${i})" class="flex-1 py-2 bg-gray-800 text-white rounded font-bold hover:bg-gray-700">${m.submitted ? (m.skipped ? 'Restored' : 'Locked') : 'Submit Score'}</button>
+                        <button onclick="submitSocialMatch(${i})" class="flex-1 py-2 bg-gray-800 text-white rounded font-bold hover:bg-gray-700" ${isSkipped ? 'disabled' : ''}>${m.submitted ? 'Locked' : 'Submit Score'}</button>
+                        ${skipBtn}
                     </div>
                 </div>`;
             });
@@ -324,7 +335,18 @@
 
         function submitSocialMatch(idx) {
             const m = roundsHistory[currentRoundIndex].matches[idx];
+            if(m.skipped) return;
             m.submitted = !m.submitted;
+            renderCurrentRound(); saveState();
+        }
+
+        function skipSocialMatch(idx) {
+            const m = roundsHistory[currentRoundIndex].matches[idx];
+            if (m.skipped) {
+                m.skipped = false; m.submitted = false; // Restore
+            } else {
+                m.skipped = true; m.submitted = true; m.score1 = 0; m.score2 = 0; // Skip
+            }
             renderCurrentRound(); saveState();
         }
 
@@ -332,6 +354,7 @@
             const stats = {};
             socialPlayers.forEach(p => stats[p.id] = { name: p.name, pts: 0, played: 0, w:0, l:0, d:0 });
             roundsHistory.forEach(r => r.matches.forEach(m => {
+                // Ignore skipped matches for stats
                 if (m.submitted && !m.skipped) {
                     const t1 = m.team1, t2 = m.team2;
                     t1.forEach(p => { stats[p.id].pts+=m.score1; stats[p.id].played++; });
@@ -352,7 +375,7 @@
             });
         }
 
-        // --- TOURNAMENT ENGINE ---
+        // --- TOURNAMENT ENGINE (Same as v6.9) ---
         function updateTournUI() {
             const count = parseInt(document.getElementById('tournGroupCount').value);
             const container = document.getElementById('tourn-rosters'); container.innerHTML = '';
@@ -381,6 +404,7 @@
 
         function generateTournRound() {
             tournData.round++; 
+            setTimeout(() => { const rd = document.getElementById('tournRoundDisplay'); if(rd) rd.innerText = tournData.round; }, 50);
             tournData.groups.forEach(g => {
                 let pool = [...g.players].sort(() => 0.5 - Math.random());
                 let matches = [];
@@ -390,58 +414,34 @@
                 }
                 g.history.push(matches);
             });
-            // Auto-navigate to latest round
             tournRoundIndex = tournData.round - 1;
             renderTournGroups(); saveState();
         }
 
-        // --- NEW ROUND NAVIGATION ---
         function changeTournRound(delta) {
             const maxRound = tournData.groups[0].history.length - 1;
             tournRoundIndex = Math.max(0, Math.min(maxRound, tournRoundIndex + delta));
-            renderTournGroups();
-            saveState();
+            renderTournGroups(); saveState();
         }
 
         function renderTournGroups() {
             const container = document.getElementById('groups-container'); 
             if(!container) return; container.innerHTML = '';
-            
-            // Update Round Title
             document.getElementById('tournRoundDisplay').innerText = tournRoundIndex + 1;
-
+            
             tournData.groups.forEach(g => {
                 if(!g.players || g.players.length === 0) return;
-                
-                // Calculate stats from ALL rounds (history)
                 const stats = calculateTournStats(g.players, g.history.map(m => ({ matches: m })));
-                // Get matches for the *selected* round view
                 const currentMatches = g.history[tournRoundIndex] || [];
-                
-                let tableHtml = `<thead class="bg-gray-50 text-[10px] text-gray-500 font-bold uppercase">
-                    <tr><th class="p-2">#</th><th class="p-2 w-1/3">Team</th><th class="p-2 text-center">Pl</th><th class="p-2 text-center">W-L-D</th><th class="p-2 text-center">+/-</th><th class="p-2 text-right">Pts</th></tr>
-                </thead><tbody>`;
-                
-                tableHtml += Object.values(stats).sort((a,b) => b.ptsWon - a.ptsWon || b.diff - a.diff).map((s,i) => `
-                    <tr class="border-b ${i<tournData.qualifiersPerGroup?'bg-yellow-50 font-bold':''}">
-                        <td class="p-2 text-xs">${i+1}</td>
-                        <td class="p-2 text-xs truncate max-w-[100px]">${s.name}</td>
-                        <td class="p-2 text-xs text-center">${s.played}</td>
-                        <td class="p-2 text-xs text-center font-mono">${s.w}-${s.l}-${s.d}</td>
-                        <td class="p-2 text-xs text-center">${s.diff > 0 ? '+' : ''}${s.diff}</td>
-                        <td class="p-2 text-right text-xs font-black text-blue-600">${s.ptsWon}</td>
-                    </tr>`).join('') + `</tbody>`;
-                
+                let tableHtml = `<thead class="bg-gray-50 text-[10px] text-gray-500 font-bold uppercase"><tr><th class="p-2">#</th><th class="p-2 w-1/3">Team</th><th class="p-2 text-center">Pl</th><th class="p-2 text-center">W-L-D</th><th class="p-2 text-center">+/-</th><th class="p-2 text-right">Pts</th></tr></thead><tbody>`;
+                tableHtml += Object.values(stats).sort((a,b) => b.ptsWon - a.ptsWon || b.diff - a.diff).map((s,i) => `<tr class="border-b ${i<tournData.qualifiersPerGroup?'bg-yellow-50 font-bold':''}"><td class="p-2 text-xs">${i+1}</td><td class="p-2 text-xs truncate max-w-[100px]">${s.name}</td><td class="p-2 text-xs text-center">${s.played}</td><td class="p-2 text-xs text-center font-mono">${s.w}-${s.l}-${s.d}</td><td class="p-2 text-xs text-center">${s.diff > 0 ? '+' : ''}${s.diff}</td><td class="p-2 text-right text-xs font-black text-blue-600">${s.ptsWon}</td></tr>`).join('') + `</tbody>`;
                 let matchHtml = currentMatches.map((m, i) => {
-                    const isDisabled = m.submitted ? 'disabled' : '';
                     const btnText = m.submitted ? 'Locked (Tap to Edit)' : 'Submit';
-                    const btnClass = m.submitted ? 'bg-gray-600 hover:bg-gray-700' : 'bg-green-600 hover:bg-green-700';
                     return `<div class="bg-white p-2 rounded border mb-2 ${m.submitted?'bg-gray-50 border-gray-300':''}">
-                    <div class="flex justify-between mb-1"><span class="text-xs truncate font-bold text-blue-800 w-2/3">${m.team1.map(p=>p.name).join(' & ')}</span><input type="number" ${isDisabled} class="w-8 border text-center rounded h-6" value="${m.score1}" onchange="updateTournScoreValue('${g.name}', ${tournRoundIndex}, ${i}, 1, this.value)"></div>
-                    <div class="flex justify-between mb-2"><span class="text-xs truncate font-bold text-red-800 w-2/3">${m.team2.map(p=>p.name).join(' & ')}</span><input type="number" ${isDisabled} class="w-8 border text-center rounded h-6" value="${m.score2}" onchange="updateTournScoreValue('${g.name}', ${tournRoundIndex}, ${i}, 2, this.value)"></div>
-                    <button onclick="toggleTournSubmit('${g.name}', ${tournRoundIndex}, ${i})" class="w-full py-1 text-[9px] text-white rounded font-bold transition ${btnClass}">${btnText}</button>
+                    <div class="flex justify-between mb-1"><span class="text-xs truncate font-bold text-blue-800 w-2/3">${m.team1.map(p=>p.name).join('&')}</span><input type="number" ${m.submitted?'disabled':''} class="w-8 border text-center rounded h-6" value="${m.score1}" onchange="updateTournScoreValue('${g.name}', ${tournRoundIndex}, ${i}, 1, this.value)"></div>
+                    <div class="flex justify-between mb-2"><span class="text-xs truncate font-bold text-red-800 w-2/3">${m.team2.map(p=>p.name).join('&')}</span><input type="number" ${m.submitted?'disabled':''} class="w-8 border text-center rounded h-6" value="${m.score2}" onchange="updateTournScoreValue('${g.name}', ${tournRoundIndex}, ${i}, 2, this.value)"></div>
+                    <button onclick="toggleTournSubmit('${g.name}', ${tournRoundIndex}, ${i})" class="w-full py-1 text-[9px] text-white rounded font-bold transition ${m.submitted?'bg-gray-600 hover:bg-gray-700':'bg-green-600 hover:bg-green-700'}">${btnText}</button>
                 </div>`}).join('');
-                
                 container.innerHTML += `<div class="bg-white border rounded-xl overflow-hidden shadow-md"><div class="bg-purple-600 p-2 font-black text-white text-sm">GROUP ${g.name}</div><div class="p-3"><table class="w-full mb-4">${tableHtml}</table><div class="mt-4 border-t pt-2">${matchHtml}</div></div></div>`;
             });
         }
@@ -554,7 +554,7 @@
         function resetApp() { if(confirm("Clear all data?")) { localStorage.clear(); location.reload(); } }
         function changeRound(delta) { currentRoundIndex = Math.max(0, Math.min(roundsHistory.length - 1, currentRoundIndex + delta)); renderCurrentRound(); }
         function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('padelPro_v6.9'));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('padelPro_v7.0'));
             const node = document.createElement('a'); node.setAttribute("href", dataStr); node.setAttribute("download", "padel_backup.json");
             document.body.appendChild(node); node.click(); node.remove();
         }
