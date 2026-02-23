@@ -3,104 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Padel Social Pro v7.0</title>
+    <title>Sortd Padel | Sorted. Set. Match.</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; -webkit-tap-highlight-color: transparent; }
-        button { touch-action: manipulation; }
-        .score-input { 
-            text-align: center; font-size: 1.75rem; font-weight: 800; width: 70px; height: 60px;
-            border-radius: 0.5rem; border: 2px solid #e5e7eb; background: #fff; transition: all 0.2s;
-        }
-        .score-input:focus { border-color: #3b82f6; ring: 2px; outline: none; }
-        .tab-btn { padding: 12px; border-bottom: 3px solid transparent; color: #6b7280; font-weight: 600; flex: 1; transition: all 0.2s; }
-        .tab-btn.active { border-bottom-color: #2563eb; color: #2563eb; background: #eff6ff; }
-        .nav-pill { padding: 10px 20px; border-radius: 99px; font-weight: 700; font-size: 0.9rem; transition: all 0.2s; cursor: pointer; text-align: center; }
-        .nav-pill.active { background: white; color: #1e3a8a; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .nav-pill.inactive { color: rgba(255,255,255,0.7); }
-        .hidden { display: none !important; }
-        .skipped-card { background-color: #f3f4f6; border-color: #d1d5db; opacity: 0.7; }
+        :root { --neon-blue: #00d2ff; --neon-green: #9dff00; --dark-bg: #0d1117; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--dark-bg); color: #ffffff; letter-spacing: -0.01em; -webkit-tap-highlight-color: transparent; }
+        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1.25rem; }
+        .nav-pill.active { background: #ffffff; color: #000000; }
+        .btn-main { background: #ffffff; color: #000000; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.2s ease; }
+        .btn-main:active { transform: scale(0.97); opacity: 0.9; }
+        .tab-btn { padding: 12px; color: rgba(255,255,255,0.4); font-weight: 600; flex: 1; transition: all 0.3s; border-radius: 0.75rem; }
+        .tab-btn.active { background: rgba(255,255,255,0.1); color: var(--neon-blue); }
+        .skipped-card { opacity: 0.4; filter: grayscale(1); }
+        input, select, textarea { color: white; }
+        option { color: black; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
 </head>
-<body class="text-gray-800 pb-24">
+<body class="pb-24">
 
-    <header class="bg-blue-900 text-white p-4 shadow-lg sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto flex justify-between items-center mb-4">
-            <h1 class="text-xl font-bold flex items-center gap-2">🎾 Padel Social Pro <span class="text-xs opacity-50">v7.0</span></h1>
-            <div class="flex gap-2">
-                <button onclick="exportData()" class="text-xs bg-blue-700 hover:bg-blue-600 px-3 py-1 rounded shadow">Save JSON</button>
-                <button onclick="resetApp()" class="text-xs bg-red-500 hover:bg-red-600 px-3 py-1 rounded shadow">Reset App</button>
+    <header class="pt-10 pb-6 px-6 text-center relative">
+        <div class="absolute top-4 right-4 flex gap-2">
+            <button onclick="exportToCSV()" class="bg-white/10 text-white text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-wider hover:bg-white/20 transition">Export CSV</button>
+            <button onclick="resetApp()" class="bg-red-500/20 text-red-400 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-wider hover:bg-red-500/40 transition">Reset</button>
+        </div>
+        <div class="flex justify-center mb-3">
+            <div class="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center font-black text-xl italic shadow-[0_0_15px_rgba(0,210,255,0.3)]">
+                S<span style="color: var(--neon-blue)">P</span>
             </div>
         </div>
-        <div class="flex bg-blue-800 p-1.5 rounded-full w-full max-w-md mx-auto">
-            <div onclick="switchAppMode('social')" id="nav-social" class="nav-pill active w-1/2">Social Mixer</div>
-            <div onclick="switchAppMode('tournament')" id="nav-tournament" class="nav-pill inactive w-1/2">Tournament</div>
+        <h1 class="text-3xl font-black tracking-tight mb-1">SORTD <span style="color: var(--neon-blue)">PADEL</span></h1>
+        <div class="flex items-center justify-center gap-2">
+            <span class="h-[1px] w-4 bg-white/20"></span>
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">Sorted. Set. Match.</p>
+            <span class="h-[1px] w-4 bg-white/20"></span>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto p-3 md:p-6">
+    <main class="max-w-4xl mx-auto px-4">
         
+        <div class="flex bg-white/5 p-1 rounded-xl mb-6 border border-white/10 max-w-sm mx-auto">
+            <button onclick="switchAppMode('social')" id="nav-social" class="nav-pill active flex-1 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition">Social Mixer</button>
+            <button onclick="switchAppMode('tournament')" id="nav-tournament" class="nav-pill text-white/50 flex-1 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition">Tournament</button>
+        </div>
+
         <div id="app-social">
-            <div id="setup-screen" class="bg-white p-5 rounded-xl shadow-lg space-y-6">
-                <div class="border-b pb-2"><h2 class="text-2xl font-bold">Social Mixer</h2></div>
-                <div>
-                    <label class="block font-semibold mb-2 text-gray-700 text-sm uppercase">Play Style</label>
-                    <div class="flex border rounded-lg overflow-hidden bg-gray-50">
-                        <button class="tab-btn active" onclick="setSocialStyle('individual', this)">👤 Individual</button>
+            <div id="setup-screen" class="glass-panel p-6 space-y-6">
+                
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Play Style</label>
+                    <div class="flex bg-white/5 p-1 rounded-xl border border-white/10">
+                        <button class="tab-btn active" onclick="setSocialStyle('individual', this)">👤 Solo</button>
                         <button class="tab-btn" onclick="setSocialStyle('fixed', this)">👫 Pairs</button>
-                        <button class="tab-btn" onclick="setSocialStyle('team', this)">⚔️ Team Battle</button>
+                        <button class="tab-btn" onclick="setSocialStyle('team', this)">⚔️ Team</button>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-blue-50 p-4 rounded-xl border">
-                    <div class="col-span-1 md:col-span-1">
-                        <label class="block font-semibold mb-1 text-sm text-blue-900">Rotation Logic</label>
-                        <select id="pairingLogicSelect" class="w-full p-2 border rounded-lg bg-white h-10">
-                            <option value="americano">Americano (Balanced)</option>
-                            <option value="mexicano">Mexicano (Ladder)</option>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-white/40 uppercase ml-1">Logic</label>
+                        <select id="pairingLogicSelect" class="w-full bg-white/5 p-3 rounded-xl border border-white/10 text-sm font-bold focus:outline-none focus:border-neon-blue">
+                            <option value="mexicano">Mexicano (Fair Ladder)</option>
+                            <option value="americano">Americano (Random)</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block font-semibold mb-1 text-sm text-blue-900">Score Format</label>
-                        <select id="scoreType" class="w-full p-2 border rounded-lg bg-white h-10" onchange="togglePointInput()">
-                            <option value="fixed">Fixed Total</option>
-                            <option value="open">Tennis / Open</option>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-white/40 uppercase ml-1">Courts</label>
+                        <input type="number" id="courtCount" value="2" class="w-full bg-white/5 p-3 rounded-xl border border-white/10 text-sm font-bold text-center focus:outline-none focus:border-neon-blue">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-white/40 uppercase ml-1">Scoring</label>
+                        <select id="scoreType" class="w-full bg-white/5 p-3 rounded-xl border border-white/10 text-sm font-bold focus:outline-none focus:border-neon-blue" onchange="togglePointInput()">
+                            <option value="fixed">Fixed Set</option>
+                            <option value="open">Tennis/Open</option>
                         </select>
                     </div>
-                    <div id="pointsInputContainer">
-                        <label class="block font-semibold mb-1 text-sm text-blue-900">Target Points</label>
-                        <select id="pointsPerMatch" class="w-full p-2 border rounded-lg h-10 bg-white font-bold">
-                            <option value="16">16 Points</option>
-                            <option value="21" selected>21 Points</option>
-                            <option value="24">24 Points</option>
+                    <div id="pointsInputContainer" class="space-y-1.5">
+                        <label class="text-[10px] font-black text-white/40 uppercase ml-1">Target Pts</label>
+                        <select id="pointsPerMatch" class="w-full bg-white/5 p-3 rounded-xl border border-white/10 text-sm font-bold focus:outline-none focus:border-neon-blue">
+                            <option value="16">16 Pts</option>
+                            <option value="21" selected>21 Pts</option>
+                            <option value="24">24 Pts</option>
                         </select>
-                    </div>
-                    <div>
-                        <label class="block font-semibold mb-1 text-sm text-blue-900">Courts</label>
-                        <input type="number" id="courtCount" value="2" class="w-full p-2 border rounded-lg text-center font-bold h-10">
                     </div>
                 </div>
-                <div id="social-input-area"></div>
-                <button onclick="startSocialGame()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg transform active:scale-[0.98] transition">START MIXER 🚀</button>
+
+                <div id="social-input-area" class="space-y-2 mt-4"></div>
+
+                <button onclick="startSocialGame()" class="btn-main w-full py-4 rounded-xl text-sm shadow-[0_0_20px_rgba(255,255,255,0.1)] mt-4">
+                    Initialize Sorting 🚀
+                </button>
             </div>
 
             <div id="active-screen" class="hidden space-y-6">
-                <div class="bg-white p-3 rounded-xl shadow-sm flex justify-between items-center sticky top-20 z-40 border border-gray-100">
-                    <button onclick="changeRound(-1)" id="prevRoundBtn" class="p-2 rounded-lg text-gray-500 disabled:opacity-30 hover:bg-gray-100">« Prev</button>
+                <div class="glass-panel p-4 flex justify-between items-center sticky top-4 z-40 bg-[#0d1117]/80">
+                    <button onclick="changeRound(-1)" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition">←</button>
                     <div class="text-center">
-                        <h2 class="text-xl font-black text-gray-800">ROUND <span id="socialRoundNumDisplay" class="text-blue-600">1</span></h2>
+                        <div class="text-[10px] font-black uppercase tracking-[0.3em] text-neon-green mb-1">Live Sorting</div>
+                        <div class="text-2xl font-black leading-none">ROUND <span id="socialRoundNumDisplay">1</span></div>
                     </div>
-                    <button onclick="generateNextRound()" id="nextRoundBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700">Next Round »</button>
+                    <button onclick="generateNextRound()" class="btn-main px-4 h-10 rounded-full text-[10px]">Next →</button>
                 </div>
+
                 <div id="matches-container" class="grid lg:grid-cols-2 gap-4"></div>
-                <div class="bg-white rounded-xl shadow border overflow-hidden">
-                    <div class="bg-gray-50 p-4 font-bold border-b text-gray-700">🏆 Social Leaderboard</div>
+
+                <div class="glass-panel overflow-hidden">
+                    <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5">
+                        <h3 class="font-black uppercase tracking-widest text-[10px] text-white/50">Leaderboard Standings</h3>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-gray-50 text-[10px] uppercase font-bold text-gray-400">
-                                <tr><th class="p-3">#</th><th class="p-3">Name</th><th class="p-3 text-center">Played</th><th class="p-3 text-center">W-L-D</th><th class="p-3 text-right">Pts</th></tr>
+                            <thead class="bg-black/20 text-[10px] uppercase font-bold text-white/40">
+                                <tr><th class="p-4">#</th><th class="p-4">Name</th><th class="p-4 text-center">Played</th><th class="p-4 text-center">W-L-D</th><th class="p-4 text-right">Pts</th></tr>
                             </thead>
-                            <tbody id="leaderboard-body" class="divide-y"></tbody>
+                            <tbody id="leaderboard-body" class="divide-y divide-white/5"></tbody>
                         </table>
                     </div>
                 </div>
@@ -108,55 +127,54 @@
         </div>
 
         <div id="app-tournament" class="hidden">
-            <div id="tourn-setup" class="bg-white p-6 rounded-xl shadow-lg space-y-8">
-                <h2 class="text-2xl font-bold border-b pb-2 text-gray-800">Tournament Mode</h2>
+            <div id="tourn-setup" class="glass-panel p-6 space-y-8">
                 <div class="grid md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Play Format</label>
-                        <select id="tournFormat" class="w-full p-3 border rounded-lg font-bold bg-gray-50" onchange="updateTournUI()">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-white/40 uppercase ml-1">Play Format</label>
+                        <select id="tournFormat" class="w-full bg-white/5 p-3 rounded-xl border border-white/10 text-sm font-bold focus:outline-none" onchange="updateTournUI()">
                             <option value="fixed">👫 Fixed Partners</option>
                             <option value="individual">👤 Individual</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Groups (1-10)</label>
-                        <select id="tournGroupCount" class="w-full p-3 border rounded-lg font-bold bg-gray-50" onchange="updateTournUI()">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-white/40 uppercase ml-1">Groups (1-10)</label>
+                        <select id="tournGroupCount" class="w-full bg-white/5 p-3 rounded-xl border border-white/10 text-sm font-bold focus:outline-none" onchange="updateTournUI()">
                             <option value="1">1 Group</option><option value="2" selected>2 Groups</option><option value="3">3 Groups</option><option value="4">4 Groups</option>
-                            <option value="5">5 Groups</option><option value="6">6 Groups</option><option value="7">7 Groups</option><option value="8">8 Groups</option><option value="9">9 Groups</option><option value="10">10 Groups</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Qualifiers / Group</label>
-                        <select id="tournQualifiersCount" class="w-full p-3 border rounded-lg font-bold bg-gray-50">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-white/40 uppercase ml-1">Qualifiers / Group</label>
+                        <select id="tournQualifiersCount" class="w-full bg-white/5 p-3 rounded-xl border border-white/10 text-sm font-bold focus:outline-none">
                             <option value="1">Best 1 (Winner)</option><option value="2" selected>Best 2</option>
                         </select>
                     </div>
                 </div>
-                <div id="tourn-rosters" class="grid md:grid-cols-2 gap-6"></div>
-                <button onclick="startTournament()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition active:scale-[0.98]">CREATE TOURNAMENT 🏆</button>
+                <div id="tourn-rosters" class="grid md:grid-cols-2 gap-4"></div>
+                <button onclick="startTournament()" class="btn-main w-full py-4 rounded-xl text-sm shadow-[0_0_20px_rgba(255,255,255,0.1)]">Create Bracket 🏆</button>
             </div>
 
             <div id="tourn-active" class="hidden space-y-8">
                 <div id="phase-groups">
-                    <div class="bg-white p-3 rounded-xl shadow-sm flex justify-between items-center mb-6 border">
-                        <button onclick="changeTournRound(-1)" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30">« Prev</button>
+                    <div class="glass-panel p-4 flex justify-between items-center mb-6 bg-[#0d1117]/80 sticky top-4 z-40">
+                        <button onclick="changeTournRound(-1)" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition">←</button>
                         <div class="text-center">
-                            <h2 class="text-xl font-black text-gray-800">ROUND <span id="tournRoundDisplay" class="text-purple-600">1</span></h2>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">GROUP STAGE</span>
+                            <div class="text-[10px] font-black uppercase tracking-[0.3em] text-neon-blue mb-1">Group Stage</div>
+                            <div class="text-2xl font-black leading-none">ROUND <span id="tournRoundDisplay">1</span></div>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="generateTournRound()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm">New Round +</button>
-                            <button onclick="generateBracket()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm">End Phase »</button>
+                            <button onclick="generateTournRound()" class="bg-white/10 text-white border border-white/20 px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase">New Round</button>
+                            <button onclick="generateBracket()" class="btn-main px-3 py-1.5 rounded-lg text-[10px]">End Phase</button>
                         </div>
                     </div>
-                    <div id="groups-container" class="grid md:grid-cols-2 gap-8"></div>
+                    <div id="groups-container" class="grid md:grid-cols-2 gap-6"></div>
                 </div>
+                
                 <div id="phase-bracket" class="hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-3xl font-black text-gray-800">Phase 2: Knockout</h2>
-                        <button id="final-advance-btn" onclick="advanceToFinal()" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-bold shadow-lg">Next Bracket Stage »</button>
+                    <div class="flex justify-between items-center px-2">
+                        <h2 class="text-xl font-black uppercase tracking-widest text-neon-blue">Knockout Stage</h2>
+                        <button id="final-advance-btn" onclick="advanceToFinal()" class="hidden btn-main px-4 py-2 rounded-lg text-[10px]">Next Bracket »</button>
                     </div>
-                    <div id="bracket-view" class="flex flex-col gap-12 p-4 items-center"></div>
+                    <div id="bracket-view" class="flex flex-col gap-8 p-2 items-center"></div>
                 </div>
             </div>
         </div>
@@ -169,22 +187,23 @@
         let tournData = { round: 0, groups: [], bracket: [], finalMatch: null, format: 'fixed', qualifiersPerGroup: 2 };
         let pointsCap = 21, totalCourts = 2, scoreType = 'fixed', currentPairingMode = 'americano';
         let tournRoundIndex = 0;
+        let pairCounter = 0;
 
         // --- PERSISTENCE ENGINE ---
         function saveState() {
             const state = { socialStyle, socialPlayers, roundsHistory, currentRoundIndex, tournData, scoreType, pointsCap, currentPairingMode, tournRoundIndex,
                 activeMode: document.getElementById('app-social').classList.contains('hidden') ? 'tournament' : 'social' };
-            localStorage.setItem('padelPro_v7.0', JSON.stringify(state));
+            localStorage.setItem('sortdPadel_v8.0', JSON.stringify(state));
         }
 
         function loadState() {
-            const saved = localStorage.getItem('padelPro_v7.0');
+            const saved = localStorage.getItem('sortdPadel_v8.0');
             if (!saved) { setSocialStyle('individual', document.querySelector('.tab-btn.active')); return; }
             const state = JSON.parse(saved);
-            socialStyle = state.socialStyle; socialPlayers = state.socialPlayers; 
-            roundsHistory = state.roundsHistory; currentRoundIndex = state.currentRoundIndex; 
+            socialStyle = state.socialStyle; socialPlayers = state.socialPlayers || []; 
+            roundsHistory = state.roundsHistory || []; currentRoundIndex = state.currentRoundIndex || 0; 
             tournData = state.tournData || { round: 0, groups: [], bracket: [], finalMatch: null }; 
-            scoreType = state.scoreType; pointsCap = state.pointsCap;
+            scoreType = state.scoreType || 'fixed'; pointsCap = state.pointsCap || 21;
             currentPairingMode = state.currentPairingMode || 'americano';
             tournRoundIndex = state.tournRoundIndex || 0;
             
@@ -193,17 +212,19 @@
                 document.getElementById('setup-screen').classList.add('hidden');
                 document.getElementById('active-screen').classList.remove('hidden');
                 renderCurrentRound();
-            } else if (state.activeMode === 'tournament' && tournData.groups.length > 0) {
+            } else if (state.activeMode === 'tournament' && tournData.groups && tournData.groups.length > 0) {
                 document.getElementById('tourn-setup').classList.add('hidden');
                 document.getElementById('tourn-active').classList.remove('hidden');
                 if(tournData.groups[0].history.length > 0) tournRoundIndex = Math.min(tournRoundIndex, tournData.groups[0].history.length - 1);
                 renderTournGroups();
-                if(tournData.bracket.length > 0) {
+                if(tournData.bracket && tournData.bracket.length > 0) {
                     document.getElementById('phase-groups').classList.add('hidden');
                     document.getElementById('phase-bracket').classList.remove('hidden');
                     renderBracket();
                     if(!tournData.finalMatch) document.getElementById('final-advance-btn').classList.remove('hidden');
                 }
+            } else {
+                setSocialStyle(socialStyle, document.querySelector(`.tab-btn[onclick*="${socialStyle}"]`));
             }
         }
 
@@ -213,27 +234,88 @@
             document.getElementById('app-social').classList.add('hidden');
             document.getElementById('app-tournament').classList.add('hidden');
             document.getElementById(`app-${mode}`).classList.remove('hidden');
-            document.querySelectorAll('.nav-pill').forEach(p => p.classList.replace('active', 'inactive'));
-            document.getElementById(`nav-${mode}`).classList.replace('inactive', 'active');
+            document.querySelectorAll('.nav-pill').forEach(p => {
+                p.classList.remove('active', 'text-white/50');
+                if(p.id === `nav-${mode}`) p.classList.add('active');
+                else p.classList.add('text-white/50');
+            });
             if(mode === 'tournament' && (!tournData.groups || tournData.groups.length === 0)) updateTournUI();
             saveState();
         }
 
+        // --- NEW CSV EXPORT FEATURE ---
+        function exportToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            const isSocial = !document.getElementById('app-social').classList.contains('hidden');
+
+            if (isSocial) {
+                csvContent += "Rank,Player,Played,W-L-D,Points\n";
+                const stats = calculateSocialStats();
+                Object.values(stats).sort((a,b) => b.pts - a.pts || b.w - a.w).forEach((s, i) => {
+                    csvContent += `${i+1},"${s.name}",${s.played},${s.w}-${s.l}-${s.d},${s.pts}\n`;
+                });
+            } else {
+                if(!tournData.groups || tournData.groups.length === 0) return alert("No tournament data to export.");
+                tournData.groups.forEach(g => {
+                    csvContent += `GROUP ${g.name}\nRank,Team,Played,W-L-D,Diff,Points\n`;
+                    const stats = calculateTournStats(g.players, g.history.map(m => ({matches:m})));
+                    Object.values(stats).sort((a,b) => b.ptsWon - a.ptsWon || b.diff - a.diff).forEach((s, i) => {
+                        csvContent += `${i+1},"${s.name}",${s.played},${s.w}-${s.l}-${s.d},${s.diff},${s.ptsWon}\n`;
+                    });
+                    csvContent += "\n";
+                });
+            }
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `sortd_padel_results.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        }
+
+        function resetApp() { if(confirm("Erase all data and start over?")) { localStorage.clear(); location.reload(); } }
+
         // --- SOCIAL MIXER LOGIC ---
         function setSocialStyle(style, btn) {
             socialStyle = style;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-white/40'); });
+            if(btn) { btn.classList.add('active'); btn.classList.remove('text-white/40'); }
             const container = document.getElementById('social-input-area');
+            
             if (style === 'team') {
                 container.innerHTML = `<div class="grid grid-cols-2 gap-4 mt-2">
-                    <div><label class="block text-xs font-bold text-blue-600 mb-1 uppercase">Team Blue</label><textarea id="inputTeamA" rows="6" class="w-full border rounded p-3 text-sm"></textarea></div>
-                    <div><label class="block text-xs font-bold text-red-600 mb-1 uppercase">Team Red</label><textarea id="inputTeamB" rows="6" class="w-full border rounded p-3 text-sm"></textarea></div>
+                    <div><label class="block text-[10px] font-black text-white/40 mb-1 uppercase">Team Blue</label><textarea id="inputTeamA" rows="6" class="w-full bg-white/5 p-3 rounded-xl border border-white/10 text-sm focus:outline-none"></textarea></div>
+                    <div><label class="block text-[10px] font-black text-white/40 mb-1 uppercase">Team Red</label><textarea id="inputTeamB" rows="6" class="w-full bg-white/5 p-3 rounded-xl border border-white/10 text-sm focus:outline-none"></textarea></div>
                 </div>`;
+            } else if (style === 'fixed') {
+                pairCounter = 0;
+                container.innerHTML = `
+                    <label class="block text-[10px] font-black text-white/40 mb-2 mt-4 uppercase">Create Your Pairs</label>
+                    <div id="dynamic-pairs-list" class="space-y-2"></div>
+                    <button type="button" onclick="addPairInputRow()" class="mt-3 w-full py-3 border-2 border-dashed border-white/10 text-white/40 font-bold rounded-xl hover:bg-white/5 transition text-xs uppercase">+ Add Another Pair</button>
+                `;
+                addPairInputRow(); addPairInputRow(); addPairInputRow(); addPairInputRow();
             } else {
-                const ph = style === 'fixed' ? 'Pair A\nPair B' : 'Player 1\nPlayer 2';
-                container.innerHTML = `<label class="block text-sm font-bold text-gray-600 mb-1 mt-2">Enter Names</label><textarea id="inputGeneral" rows="6" class="w-full p-4 border rounded-xl" placeholder="${ph}"></textarea>`;
+                container.innerHTML = `<label class="block text-[10px] font-black text-white/40 mb-1 mt-2 uppercase">Enter Players (One per line)</label><textarea id="inputGeneral" rows="6" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-sm focus:outline-none" placeholder="Player 1\nPlayer 2..."></textarea>`;
             }
+        }
+
+        function addPairInputRow() {
+            pairCounter++;
+            const list = document.getElementById('dynamic-pairs-list');
+            if(!list) return;
+            const div = document.createElement('div');
+            div.className = "flex gap-2 items-center bg-white/5 p-2 rounded-xl border border-white/10";
+            div.innerHTML = `
+                <span class="font-bold text-white/30 w-4 text-right text-[10px]">${pairCounter}.</span>
+                <input type="text" class="flex-1 p-2 border border-white/10 rounded-lg bg-black/40 text-sm text-white focus:outline-none pair-p1" placeholder="Player 1">
+                <span class="font-black text-neon-blue text-xs">&</span>
+                <input type="text" class="flex-1 p-2 border border-white/10 rounded-lg bg-black/40 text-sm text-white focus:outline-none pair-p2" placeholder="Player 2">
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-500 font-bold px-2 text-xl leading-none">&times;</button>
+            `;
+            list.appendChild(div);
         }
 
         function togglePointInput() { 
@@ -244,16 +326,33 @@
         function startSocialGame() {
             scoreType = document.getElementById('scoreType').value;
             currentPairingMode = document.getElementById('pairingLogicSelect').value;
-            totalCourts = parseInt(document.getElementById('courtCount').value);
-            pointsCap = parseInt(document.getElementById('pointsPerMatch').value);
+            totalCourts = parseInt(document.getElementById('courtCount').value) || 1;
+            pointsCap = parseInt(document.getElementById('pointsPerMatch').value) || 21;
             socialPlayers = [];
+            
             if(socialStyle === 'team') {
                 document.getElementById('inputTeamA').value.split('\n').forEach((n, i) => { if(n.trim()) socialPlayers.push({ id: 'B'+i, name: n.trim(), team: 'Blue' }); });
                 document.getElementById('inputTeamB').value.split('\n').forEach((n, i) => { if(n.trim()) socialPlayers.push({ id: 'R'+i, name: n.trim(), team: 'Red' }); });
+                if(socialPlayers.length < 4) return alert("Add at least 4 players.");
+            } else if (socialStyle === 'fixed') {
+                const p1s = document.querySelectorAll('.pair-p1');
+                const p2s = document.querySelectorAll('.pair-p2');
+                let validPairs = 0;
+                p1s.forEach((inp1, idx) => {
+                    const val1 = inp1.value.trim();
+                    const val2 = p2s[idx].value.trim();
+                    if (val1 || val2) {
+                        let combined = (val1 && val2) ? `${val1} & ${val2}` : (val1 || val2);
+                        socialPlayers.push({ id: `P${validPairs}`, name: combined });
+                        validPairs++;
+                    }
+                });
+                if(socialPlayers.length < 2) return alert("Add at least 2 pairs.");
             } else {
                 document.getElementById('inputGeneral').value.split('\n').forEach((n, i) => { if(n.trim()) socialPlayers.push({ id: i, name: n.trim() }); });
+                if(socialPlayers.length < 4) return alert("Add at least 4 players.");
             }
-            if(socialPlayers.length < 4) return alert("Add at least 4 players.");
+            
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('active-screen').classList.remove('hidden');
             generateNextRound();
@@ -262,28 +361,41 @@
         function generateNextRound() {
             if (roundsHistory.length > 0) {
                 const unsubmitted = roundsHistory[currentRoundIndex].matches.filter(m => !m.submitted);
-                if (unsubmitted.length > 0) return alert("Finish all matches first.");
+                if (unsubmitted.length > 0) return alert("Finish all current matches first (Submit or Skip).");
             }
 
-            // --- BALANCED PAIRING LOGIC ---
-            // 1. Calculate current play count for everyone
             const stats = calculateSocialStats(); 
-            // 2. Sort pool: Least played go first
-            let pool = [...socialPlayers];
-            if(currentPairingMode === 'americano') {
-                pool.sort((a,b) => (stats[a.id].played - stats[b.id].played) || (0.5 - Math.random()));
-            } else { // Mexicano (Ladder)
-                pool.sort((a,b) => stats[b.id].pts - stats[a.id].pts);
-            }
-            
+            let pool = [...socialPlayers].sort((a,b) => (stats[a.id].played - stats[b.id].played) || (0.5 - Math.random()));
             let matches = [];
+
             if(socialStyle === 'team') {
-                let b = pool.filter(p => p.team === 'Blue'), r = pool.filter(p => p.team === 'Red');
-                while(b.length >= 2 && r.length >= 2 && matches.length < totalCourts) matches.push({ team1: [b.shift(), b.shift()], team2: [r.shift(), r.shift()], score1: 0, score2: 0, submitted: false, skipped: false });
+                let b = pool.filter(p => p.team === 'Blue'); let r = pool.filter(p => p.team === 'Red');
+                let activeB = b.slice(0, totalCourts * 2); let activeR = r.slice(0, totalCourts * 2);
+                if (currentPairingMode === 'mexicano') { activeB.sort((x, y) => stats[y.id].pts - stats[x.id].pts); activeR.sort((x, y) => stats[y.id].pts - stats[x.id].pts); } 
+                else { activeB.sort(() => 0.5 - Math.random()); activeR.sort(() => 0.5 - Math.random()); }
+                while(activeB.length >= 2 && activeR.length >= 2 && matches.length < totalCourts) {
+                    matches.push({ team1: [activeB.shift(), activeB.shift()], team2: [activeR.shift(), activeR.shift()], score1: 0, score2: 0, submitted: false, skipped: false });
+                }
             } else if(socialStyle === 'fixed') {
-                while(pool.length >= 2 && matches.length < totalCourts) matches.push({ team1: [pool.shift()], team2: [pool.shift()], score1: 0, score2: 0, submitted: false, skipped: false });
-            } else {
-                while(pool.length >= 4 && matches.length < totalCourts) matches.push({ team1: [pool.shift(), pool.shift()], team2: [pool.shift(), pool.shift()], score1: 0, score2: 0, submitted: false, skipped: false });
+                let activePool = pool.slice(0, totalCourts * 2);
+                if (currentPairingMode === 'mexicano') activePool.sort((x, y) => stats[y.id].pts - stats[x.id].pts);
+                else activePool.sort(() => 0.5 - Math.random());
+                while(activePool.length >= 2 && matches.length < totalCourts) {
+                    matches.push({ team1: [activePool.shift()], team2: [activePool.shift()], score1: 0, score2: 0, submitted: false, skipped: false });
+                }
+            } else { 
+                let activePool = pool.slice(0, totalCourts * 4);
+                if (currentPairingMode === 'mexicano') {
+                    activePool.sort((x, y) => stats[y.id].pts - stats[x.id].pts);
+                    while(activePool.length >= 4 && matches.length < totalCourts) {
+                        matches.push({ team1: [activePool.shift(), activePool.shift()], team2: [activePool.shift(), activePool.shift()], score1: 0, score2: 0, submitted: false, skipped: false });
+                    }
+                } else { 
+                    activePool.sort(() => 0.5 - Math.random());
+                    while(activePool.length >= 4 && matches.length < totalCourts) {
+                        matches.push({ team1: [activePool.shift(), activePool.shift()], team2: [activePool.shift(), activePool.shift()], score1: 0, score2: 0, submitted: false, skipped: false });
+                    }
+                }
             }
             roundsHistory.push({ roundNum: roundsHistory.length + 1, matches });
             currentRoundIndex = roundsHistory.length - 1;
@@ -297,23 +409,27 @@
             
             data.matches.forEach((m, i) => {
                 const isSkipped = m.skipped;
-                const cardClass = isSkipped ? 'skipped-card rounded-xl border p-4' : `bg-white p-4 rounded-xl border ${m.submitted ? 'bg-green-50 border-green-400' : 'shadow-sm'}`;
+                const cardClass = isSkipped ? 'skipped-card glass-panel p-4' : `glass-panel p-4 ${m.submitted ? 'border-neon-green/50 bg-neon-green/5' : ''}`;
+                const w1 = m.score1 > m.score2 ? 'text-neon-blue font-black' : 'text-white/80 font-bold';
+                const w2 = m.score2 > m.score1 ? 'text-neon-green font-black' : 'text-white/80 font-bold';
                 const inputState = isSkipped ? 'disabled' : '';
                 
                 let skipBtn = '';
-                // Enable Skip button only if not submitted yet
-                if(!m.submitted) {
-                    skipBtn = `<button onclick="skipSocialMatch(${i})" class="w-1/3 py-2 bg-gray-200 text-gray-500 rounded font-bold ml-2 hover:bg-gray-300">Skip</button>`;
-                } else if (m.skipped) {
-                    skipBtn = `<button onclick="skipSocialMatch(${i})" class="w-1/3 py-2 bg-gray-200 text-gray-500 rounded font-bold ml-2 hover:bg-gray-300">Restore</button>`;
-                }
+                if(!m.submitted) skipBtn = `<button onclick="skipSocialMatch(${i})" class="w-1/3 py-2 bg-white/5 text-white/50 rounded-xl font-bold ml-2 hover:bg-white/10 text-xs uppercase">Skip</button>`;
+                else if (m.skipped) skipBtn = `<button onclick="skipSocialMatch(${i})" class="w-1/3 py-2 bg-white/5 text-white/50 rounded-xl font-bold ml-2 hover:bg-white/10 text-xs uppercase">Restore</button>`;
 
                 container.innerHTML += `<div class="${cardClass} relative">
-                    ${isSkipped ? '<div class="absolute inset-0 flex items-center justify-center font-black text-gray-400 text-xl tracking-widest uppercase pointer-events-none">Skipped</div>' : ''}
-                    <div class="flex justify-between items-center mb-2"><span class="truncate w-32 font-bold text-blue-800">${m.team1.map(p=>p.name).join(' & ')}</span><input type="number" ${inputState} class="w-16 border text-center font-bold text-xl rounded" value="${m.score1}" onchange="updateSocialScore(${i}, 1, this.value)"></div>
-                    <div class="flex justify-between items-center mb-4"><span class="truncate w-32 font-bold text-red-800">${m.team2.map(p=>p.name).join(' & ')}</span><input type="number" ${inputState} class="w-16 border text-center font-bold text-xl rounded" value="${m.score2}" onchange="updateSocialScore(${i}, 2, this.value)"></div>
+                    ${isSkipped ? '<div class="absolute inset-0 flex items-center justify-center font-black text-white/60 text-xl tracking-widest uppercase pointer-events-none">Skipped</div>' : ''}
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="${w1} flex-1 pr-2 leading-tight break-words text-sm">${m.team1.map(p=>p.name).join(' & ')}</span>
+                        <input type="number" ${inputState} class="w-14 h-10 flex-shrink-0 bg-black/40 border border-white/20 text-center font-bold text-lg rounded-lg text-white" value="${m.score1}" onchange="updateSocialScore(${i}, 1, this.value)">
+                    </div>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="${w2} flex-1 pr-2 leading-tight break-words text-sm">${m.team2.map(p=>p.name).join(' & ')}</span>
+                        <input type="number" ${inputState} class="w-14 h-10 flex-shrink-0 bg-black/40 border border-white/20 text-center font-bold text-lg rounded-lg text-white" value="${m.score2}" onchange="updateSocialScore(${i}, 2, this.value)">
+                    </div>
                     <div class="flex">
-                        <button onclick="submitSocialMatch(${i})" class="flex-1 py-2 bg-gray-800 text-white rounded font-bold hover:bg-gray-700" ${isSkipped ? 'disabled' : ''}>${m.submitted ? 'Locked' : 'Submit Score'}</button>
+                        <button onclick="submitSocialMatch(${i})" class="flex-1 py-3 ${m.submitted?'bg-white/10 text-white/50':'btn-main'} rounded-xl font-bold text-xs uppercase" ${isSkipped ? 'disabled' : ''}>${m.submitted ? 'Locked (Edit)' : 'Lock Score'}</button>
                         ${skipBtn}
                     </div>
                 </div>`;
@@ -342,11 +458,8 @@
 
         function skipSocialMatch(idx) {
             const m = roundsHistory[currentRoundIndex].matches[idx];
-            if (m.skipped) {
-                m.skipped = false; m.submitted = false; // Restore
-            } else {
-                m.skipped = true; m.submitted = true; m.score1 = 0; m.score2 = 0; // Skip
-            }
+            if (m.skipped) { m.skipped = false; m.submitted = false; } 
+            else { m.skipped = true; m.submitted = true; m.score1 = 0; m.score2 = 0; }
             renderCurrentRound(); saveState();
         }
 
@@ -354,7 +467,6 @@
             const stats = {};
             socialPlayers.forEach(p => stats[p.id] = { name: p.name, pts: 0, played: 0, w:0, l:0, d:0 });
             roundsHistory.forEach(r => r.matches.forEach(m => {
-                // Ignore skipped matches for stats
                 if (m.submitted && !m.skipped) {
                     const t1 = m.team1, t2 = m.team2;
                     t1.forEach(p => { stats[p.id].pts+=m.score1; stats[p.id].played++; });
@@ -371,15 +483,15 @@
             const stats = calculateSocialStats();
             const tbody = document.getElementById('leaderboard-body'); tbody.innerHTML = '';
             Object.values(stats).sort((a,b) => b.pts - a.pts || b.w - a.w).forEach((s, i) => {
-                tbody.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="p-3 text-gray-400">#${i+1}</td><td class="p-3 font-bold">${s.name}</td><td class="p-3 text-center">${s.played}</td><td class="p-3 text-center text-xs font-mono">${s.w}-${s.l}-${s.d}</td><td class="p-3 text-right font-black text-blue-600">${s.pts}</td></tr>`;
+                tbody.innerHTML += `<tr><td class="p-4 text-white/40 font-bold">#${i+1}</td><td class="p-4 font-bold break-words">${s.name}</td><td class="p-4 text-center">${s.played}</td><td class="p-4 text-center text-xs text-white/60">${s.w}-${s.l}-${s.d}</td><td class="p-4 text-right font-black text-neon-blue">${s.pts}</td></tr>`;
             });
         }
 
-        // --- TOURNAMENT ENGINE (Same as v6.9) ---
+        // --- TOURNAMENT ENGINE ---
         function updateTournUI() {
             const count = parseInt(document.getElementById('tournGroupCount').value);
             const container = document.getElementById('tourn-rosters'); container.innerHTML = '';
-            for(let i=0; i<count; i++) container.innerHTML += `<div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-black text-purple-600 uppercase mb-1">Group ${String.fromCharCode(65+i)}</label><textarea id="roster-${i}" rows="4" class="w-full border rounded p-2 text-sm" placeholder="Names..."></textarea></div>`;
+            for(let i=0; i<count; i++) container.innerHTML += `<div class="bg-white/5 p-4 rounded-xl border border-white/10"><label class="block text-[10px] font-black text-neon-blue uppercase mb-2">Group ${String.fromCharCode(65+i)}</label><textarea id="roster-${i}" rows="4" class="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm focus:outline-none" placeholder="Names..."></textarea></div>`;
         }
 
         function startTournament() {
@@ -391,9 +503,7 @@
             for(let i=0; i<groupCount; i++) {
                 const roster = [];
                 const input = document.getElementById(`roster-${i}`);
-                if(input) {
-                    input.value.split('\n').forEach((n, idx) => { if(n.trim()) roster.push({ id: `T${i}-${idx}`, name: n.trim(), pool: String.fromCharCode(65+i) }); });
-                }
+                if(input) { input.value.split('\n').forEach((n, idx) => { if(n.trim()) roster.push({ id: `T${i}-${idx}`, name: n.trim(), pool: String.fromCharCode(65+i) }); }); }
                 tournData.groups.push({ name: String.fromCharCode(65+i), players: roster, history: [] });
             }
             if(tournData.groups.some(g => g.players.length < 2)) return alert("All groups must have at least 2 teams.");
@@ -433,16 +543,18 @@
                 if(!g.players || g.players.length === 0) return;
                 const stats = calculateTournStats(g.players, g.history.map(m => ({ matches: m })));
                 const currentMatches = g.history[tournRoundIndex] || [];
-                let tableHtml = `<thead class="bg-gray-50 text-[10px] text-gray-500 font-bold uppercase"><tr><th class="p-2">#</th><th class="p-2 w-1/3">Team</th><th class="p-2 text-center">Pl</th><th class="p-2 text-center">W-L-D</th><th class="p-2 text-center">+/-</th><th class="p-2 text-right">Pts</th></tr></thead><tbody>`;
-                tableHtml += Object.values(stats).sort((a,b) => b.ptsWon - a.ptsWon || b.diff - a.diff).map((s,i) => `<tr class="border-b ${i<tournData.qualifiersPerGroup?'bg-yellow-50 font-bold':''}"><td class="p-2 text-xs">${i+1}</td><td class="p-2 text-xs truncate max-w-[100px]">${s.name}</td><td class="p-2 text-xs text-center">${s.played}</td><td class="p-2 text-xs text-center font-mono">${s.w}-${s.l}-${s.d}</td><td class="p-2 text-xs text-center">${s.diff > 0 ? '+' : ''}${s.diff}</td><td class="p-2 text-right text-xs font-black text-blue-600">${s.ptsWon}</td></tr>`).join('') + `</tbody>`;
+                
+                let tableHtml = `<thead class="bg-black/20 text-[10px] text-white/40 font-bold uppercase"><tr><th class="p-2">#</th><th class="p-2 text-left">Team</th><th class="p-2 text-center">Pl</th><th class="p-2 text-center">W-L-D</th><th class="p-2 text-center">+/-</th><th class="p-2 text-right">Pts</th></tr></thead><tbody class="divide-y divide-white/5">`;
+                tableHtml += Object.values(stats).sort((a,b) => b.ptsWon - a.ptsWon || b.diff - a.diff).map((s,i) => `<tr class="${i<tournData.qualifiersPerGroup?'bg-neon-green/10 font-bold':''}"><td class="p-2 text-xs">${i+1}</td><td class="p-2 text-xs break-words">${s.name}</td><td class="p-2 text-xs text-center">${s.played}</td><td class="p-2 text-xs text-center font-mono text-white/60">${s.w}-${s.l}-${s.d}</td><td class="p-2 text-xs text-center">${s.diff > 0 ? '+' : ''}${s.diff}</td><td class="p-2 text-right text-xs font-black text-neon-blue">${s.ptsWon}</td></tr>`).join('') + `</tbody>`;
+                
                 let matchHtml = currentMatches.map((m, i) => {
-                    const btnText = m.submitted ? 'Locked (Tap to Edit)' : 'Submit';
-                    return `<div class="bg-white p-2 rounded border mb-2 ${m.submitted?'bg-gray-50 border-gray-300':''}">
-                    <div class="flex justify-between mb-1"><span class="text-xs truncate font-bold text-blue-800 w-2/3">${m.team1.map(p=>p.name).join('&')}</span><input type="number" ${m.submitted?'disabled':''} class="w-8 border text-center rounded h-6" value="${m.score1}" onchange="updateTournScoreValue('${g.name}', ${tournRoundIndex}, ${i}, 1, this.value)"></div>
-                    <div class="flex justify-between mb-2"><span class="text-xs truncate font-bold text-red-800 w-2/3">${m.team2.map(p=>p.name).join('&')}</span><input type="number" ${m.submitted?'disabled':''} class="w-8 border text-center rounded h-6" value="${m.score2}" onchange="updateTournScoreValue('${g.name}', ${tournRoundIndex}, ${i}, 2, this.value)"></div>
-                    <button onclick="toggleTournSubmit('${g.name}', ${tournRoundIndex}, ${i})" class="w-full py-1 text-[9px] text-white rounded font-bold transition ${m.submitted?'bg-gray-600 hover:bg-gray-700':'bg-green-600 hover:bg-green-700'}">${btnText}</button>
+                    const btnText = m.submitted ? 'Locked (Edit)' : 'Submit';
+                    return `<div class="bg-white/5 p-3 rounded-xl border border-white/10 mb-3 ${m.submitted?'opacity-50':''}">
+                    <div class="flex justify-between items-center mb-2"><span class="text-xs font-bold text-white flex-1 pr-2 leading-tight break-words">${m.team1.map(p=>p.name).join(' & ')}</span><input type="number" ${m.submitted?'disabled':''} class="w-12 h-9 flex-shrink-0 bg-black/40 border border-white/20 text-center font-bold rounded-lg text-white" value="${m.score1}" onchange="updateTournScoreValue('${g.name}', ${tournRoundIndex}, ${i}, 1, this.value)"></div>
+                    <div class="flex justify-between items-center mb-3"><span class="text-xs font-bold text-white flex-1 pr-2 leading-tight break-words">${m.team2.map(p=>p.name).join(' & ')}</span><input type="number" ${m.submitted?'disabled':''} class="w-12 h-9 flex-shrink-0 bg-black/40 border border-white/20 text-center font-bold rounded-lg text-white" value="${m.score2}" onchange="updateTournScoreValue('${g.name}', ${tournRoundIndex}, ${i}, 2, this.value)"></div>
+                    <button onclick="toggleTournSubmit('${g.name}', ${tournRoundIndex}, ${i})" class="w-full py-2.5 text-[10px] rounded-lg font-black uppercase transition tracking-wider ${m.submitted?'bg-white/10 text-white/50':'btn-main'}">${btnText}</button>
                 </div>`}).join('');
-                container.innerHTML += `<div class="bg-white border rounded-xl overflow-hidden shadow-md"><div class="bg-purple-600 p-2 font-black text-white text-sm">GROUP ${g.name}</div><div class="p-3"><table class="w-full mb-4">${tableHtml}</table><div class="mt-4 border-t pt-2">${matchHtml}</div></div></div>`;
+                container.innerHTML += `<div class="glass-panel overflow-hidden"><div class="bg-white/5 border-b border-white/10 p-3 font-black text-neon-blue text-[10px] uppercase tracking-widest">GROUP ${g.name}</div><div class="p-3"><table class="w-full mb-4 text-sm">${tableHtml}</table><div class="mt-4 border-t border-white/10 pt-3">${matchHtml}</div></div></div>`;
             });
         }
 
@@ -515,20 +627,22 @@
             const container = document.getElementById('bracket-view'); let html = '';
             tournData.bracket.forEach((m, idx) => {
                 let win = m.s1 > m.s2 ? 1 : m.s2 > m.s1 ? 2 : 0;
-                html += `<div class="w-[400px] bg-white rounded-xl shadow-lg border overflow-hidden mb-8">
-                    <div class="p-4 flex justify-between items-center ${win===1?'bg-green-100 border-green-500':''}">
-                        <span class="font-black text-blue-900">${m.t1.name}</span><input type="number" class="score-input w-16 h-10 text-lg" value="${m.s1}" onchange="tournData.bracket[${idx}].s1=parseInt(this.value);renderBracket();saveState();">
+                html += `<div class="w-full glass-panel overflow-hidden mb-6">
+                    <div class="p-5 flex justify-between items-center border-b border-white/10 ${win===1?'bg-neon-green/10':''}">
+                        <span class="font-black ${win===1?'text-neon-green':'text-white'} flex-1 pr-2 leading-tight break-words">${m.t1.name}</span>
+                        <input type="number" class="w-14 h-10 flex-shrink-0 bg-black/40 border border-white/20 text-center font-bold text-lg rounded-lg text-white" value="${m.s1}" onchange="tournData.bracket[${idx}].s1=parseInt(this.value);renderBracket();saveState();">
                     </div>
-                    <div class="p-4 flex justify-between items-center border-t ${win===2?'bg-green-100 border-green-500':''}">
-                        <span class="font-black text-red-900">${m.t2.name}</span><input type="number" class="score-input w-16 h-10 text-lg" value="${m.s2}" onchange="tournData.bracket[${idx}].s2=parseInt(this.value);renderBracket();saveState();">
+                    <div class="p-5 flex justify-between items-center ${win===2?'bg-neon-green/10':''}">
+                        <span class="font-black ${win===2?'text-neon-green':'text-white'} flex-1 pr-2 leading-tight break-words">${m.t2.name}</span>
+                        <input type="number" class="w-14 h-10 flex-shrink-0 bg-black/40 border border-white/20 text-center font-bold text-lg rounded-lg text-white" value="${m.s2}" onchange="tournData.bracket[${idx}].s2=parseInt(this.value);renderBracket();saveState();">
                     </div>
                 </div>`;
             });
             if(tournData.finalMatch) {
                 let m = tournData.finalMatch, win = m.s1 > m.s2 ? 1 : m.s2 > m.s1 ? 2 : 0;
-                html += `<div class="mt-8 text-center uppercase font-black text-gray-400">Grand Final</div><div class="w-[400px] bg-white rounded-xl shadow-2xl border-4 border-yellow-400 overflow-hidden">
-                    <div class="p-4 flex justify-between items-center ${win===1?'bg-yellow-100':''}"><span class="font-black text-blue-900">${m.t1.name}</span><input type="number" class="score-input w-16 h-10" value="${m.s1}" onchange="tournData.finalMatch.s1=parseInt(this.value);renderBracket();saveState();"></div>
-                    <div class="p-4 flex justify-between items-center border-t ${win===2?'bg-yellow-100':''}"><span class="font-black text-red-900">${m.t2.name}</span><input type="number" class="score-input w-16 h-10" value="${m.s2}" onchange="tournData.finalMatch.s2=parseInt(this.value);renderBracket();saveState();"></div></div>`;
+                html += `<div class="mt-8 mb-4 text-center uppercase font-black text-neon-blue tracking-widest text-[10px]">Grand Final</div><div class="w-full glass-panel border-2 border-neon-blue overflow-hidden shadow-[0_0_30px_rgba(0,210,255,0.2)]">
+                    <div class="p-5 flex justify-between items-center border-b border-white/10 ${win===1?'bg-neon-blue/20':''}"><span class="font-black ${win===1?'text-neon-blue':'text-white'} flex-1 pr-2 leading-tight break-words">${m.t1.name}</span><input type="number" class="w-14 h-10 flex-shrink-0 bg-black/40 border border-white/20 text-center font-bold text-lg rounded-lg text-white" value="${m.s1}" onchange="tournData.finalMatch.s1=parseInt(this.value);renderBracket();saveState();"></div>
+                    <div class="p-5 flex justify-between items-center ${win===2?'bg-neon-blue/20':''}"><span class="font-black ${win===2?'text-neon-blue':'text-white'} flex-1 pr-2 leading-tight break-words">${m.t2.name}</span><input type="number" class="w-14 h-10 flex-shrink-0 bg-black/40 border border-white/20 text-center font-bold text-lg rounded-lg text-white" value="${m.s2}" onchange="tournData.finalMatch.s2=parseInt(this.value);renderBracket();saveState();"></div></div>`;
             }
             container.innerHTML = html;
         }
@@ -538,25 +652,14 @@
             if(winners.includes(null)) return alert("Fill all scores first!");
             if (tournData.finalMatch && (tournData.finalMatch.s1 > 0 || tournData.finalMatch.s2 > 0)) return alert("Tournament Finished!");
             if (winners.length === 2) {
-                tournData.bracket = []; 
-                tournData.finalMatch = { t1: winners[0], t2: winners[1], s1: 0, s2: 0 };
+                tournData.bracket = []; tournData.finalMatch = { t1: winners[0], t2: winners[1], s1: 0, s2: 0 };
                 document.getElementById('final-advance-btn').innerText = "Finish Tournament";
             } else if (winners.length >= 2) {
                 const nextRound = [];
-                for(let i=0; i<winners.length; i+=2) {
-                    if(winners[i+1]) nextRound.push({ id: Math.random(), t1: winners[i], t2: winners[i+1], s1:0, s2:0 });
-                }
+                for(let i=0; i<winners.length; i+=2) { if(winners[i+1]) nextRound.push({ id: Math.random(), t1: winners[i], t2: winners[i+1], s1:0, s2:0 }); }
                 tournData.bracket = nextRound;
             }
             renderBracket(); saveState();
-        }
-
-        function resetApp() { if(confirm("Clear all data?")) { localStorage.clear(); location.reload(); } }
-        function changeRound(delta) { currentRoundIndex = Math.max(0, Math.min(roundsHistory.length - 1, currentRoundIndex + delta)); renderCurrentRound(); }
-        function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('padelPro_v7.0'));
-            const node = document.createElement('a'); node.setAttribute("href", dataStr); node.setAttribute("download", "padel_backup.json");
-            document.body.appendChild(node); node.click(); node.remove();
         }
     </script>
 </body>
