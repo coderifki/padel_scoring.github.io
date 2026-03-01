@@ -100,12 +100,15 @@
 
             <div id="active-screen" class="hidden space-y-6">
                 <div class="glass-panel p-4 flex justify-between items-center sticky top-4 z-40 bg-[#0d1117]/80">
-                    <button onclick="changeRound(-1)" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition">←</button>
+                    <div class="flex gap-2">
+                        <button onclick="changeRound(-1)" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition">←</button>
+                        <button onclick="changeRound(1)" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition">→</button>
+                    </div>
                     <div class="text-center">
                         <div class="text-[10px] font-black uppercase tracking-[0.3em] text-neon-green mb-1">Live Sorting</div>
                         <div class="text-2xl font-black leading-none">ROUND <span id="socialRoundNumDisplay">1</span></div>
                     </div>
-                    <button onclick="generateNextRound()" class="btn-main px-4 h-10 rounded-full text-[10px]">Next →</button>
+                    <button onclick="generateNextRound()" class="btn-main px-4 h-10 rounded-full text-[10px]">Next</button>
                 </div>
 
                 <div id="matches-container" class="grid lg:grid-cols-2 gap-4"></div>
@@ -156,14 +159,17 @@
             <div id="tourn-active" class="hidden space-y-8">
                 <div id="phase-groups">
                     <div class="glass-panel p-4 flex justify-between items-center mb-6 bg-[#0d1117]/80 sticky top-4 z-40">
-                        <button onclick="changeTournRound(-1)" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition">←</button>
+                        <div class="flex gap-2">
+                            <button onclick="changeTournRound(-1)" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition">←</button>
+                            <button onclick="changeTournRound(1)" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition">→</button>
+                        </div>
                         <div class="text-center">
                             <div class="text-[10px] font-black uppercase tracking-[0.3em] text-neon-blue mb-1">Group Stage</div>
                             <div class="text-2xl font-black leading-none">ROUND <span id="tournRoundDisplay">1</span></div>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="generateTournRound()" class="bg-white/10 text-white border border-white/20 px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase">New Round</button>
-                            <button onclick="generateBracket()" class="btn-main px-3 py-1.5 rounded-lg text-[10px]">End Phase</button>
+                            <button onclick="generateTournRound()" class="bg-white/10 text-white border border-white/20 px-4 h-10 rounded-full font-bold text-[10px] uppercase">Next</button>
+                            <button onclick="generateBracket()" class="btn-main px-4 h-10 rounded-full text-[10px]">End Phase</button>
                         </div>
                     </div>
                     <div id="groups-container" class="grid md:grid-cols-2 gap-6"></div>
@@ -193,11 +199,11 @@
         function saveState() {
             const state = { socialStyle, socialPlayers, roundsHistory, currentRoundIndex, tournData, scoreType, pointsCap, currentPairingMode, tournRoundIndex,
                 activeMode: document.getElementById('app-social').classList.contains('hidden') ? 'tournament' : 'social' };
-            localStorage.setItem('sortdPadel_v8.0', JSON.stringify(state));
+            localStorage.setItem('sortdPadel_v8.2', JSON.stringify(state));
         }
 
         function loadState() {
-            const saved = localStorage.getItem('sortdPadel_v8.0');
+            const saved = localStorage.getItem('sortdPadel_v8.2');
             if (!saved) { setSocialStyle('individual', document.querySelector('.tab-btn.active')); return; }
             const state = JSON.parse(saved);
             socialStyle = state.socialStyle; socialPlayers = state.socialPlayers || []; 
@@ -243,7 +249,7 @@
             saveState();
         }
 
-        // --- NEW CSV EXPORT FEATURE ---
+        // --- CSV EXPORT FEATURE ---
         function exportToCSV() {
             let csvContent = "data:text/csv;charset=utf-8,";
             const isSocial = !document.getElementById('app-social').classList.contains('hidden');
@@ -402,6 +408,14 @@
             renderCurrentRound(); saveState();
         }
 
+        // --- ROUND NAVIGATION ---
+        function changeRound(delta) {
+            if (roundsHistory.length === 0) return;
+            currentRoundIndex = Math.max(0, Math.min(roundsHistory.length - 1, currentRoundIndex + delta));
+            renderCurrentRound();
+            saveState();
+        }
+
         function renderCurrentRound() {
             const data = roundsHistory[currentRoundIndex];
             document.getElementById('socialRoundNumDisplay').innerText = data.roundNum;
@@ -415,18 +429,18 @@
                 const inputState = isSkipped ? 'disabled' : '';
                 
                 let skipBtn = '';
-                if(!m.submitted) skipBtn = `<button onclick="skipSocialMatch(${i})" class="w-1/3 py-2 bg-white/5 text-white/50 rounded-xl font-bold ml-2 hover:bg-white/10 text-xs uppercase">Skip</button>`;
-                else if (m.skipped) skipBtn = `<button onclick="skipSocialMatch(${i})" class="w-1/3 py-2 bg-white/5 text-white/50 rounded-xl font-bold ml-2 hover:bg-white/10 text-xs uppercase">Restore</button>`;
+                if(!m.submitted) skipBtn = `<button onclick="skipSocialMatch(${i})" class="w-1/3 py-2 bg-white/5 text-white/50 rounded-xl font-bold ml-2 hover:bg-white/10 text-xs uppercase transition">Skip</button>`;
+                else if (m.skipped) skipBtn = `<button onclick="skipSocialMatch(${i})" class="w-1/3 py-2 bg-white/5 text-white/50 rounded-xl font-bold ml-2 hover:bg-white/10 text-xs uppercase transition">Restore</button>`;
 
                 container.innerHTML += `<div class="${cardClass} relative">
                     ${isSkipped ? '<div class="absolute inset-0 flex items-center justify-center font-black text-white/60 text-xl tracking-widest uppercase pointer-events-none">Skipped</div>' : ''}
                     <div class="flex justify-between items-center mb-3">
                         <span class="${w1} flex-1 pr-2 leading-tight break-words text-sm">${m.team1.map(p=>p.name).join(' & ')}</span>
-                        <input type="number" ${inputState} class="w-14 h-10 flex-shrink-0 bg-black/40 border border-white/20 text-center font-bold text-lg rounded-lg text-white" value="${m.score1}" onchange="updateSocialScore(${i}, 1, this.value)">
+                        <input type="number" ${inputState} class="w-14 h-10 flex-shrink-0 bg-black/40 border border-white/20 text-center font-bold text-lg rounded-lg text-white transition focus:border-neon-blue" value="${m.score1}" onchange="updateSocialScore(${i}, 1, this.value)">
                     </div>
                     <div class="flex justify-between items-center mb-4">
                         <span class="${w2} flex-1 pr-2 leading-tight break-words text-sm">${m.team2.map(p=>p.name).join(' & ')}</span>
-                        <input type="number" ${inputState} class="w-14 h-10 flex-shrink-0 bg-black/40 border border-white/20 text-center font-bold text-lg rounded-lg text-white" value="${m.score2}" onchange="updateSocialScore(${i}, 2, this.value)">
+                        <input type="number" ${inputState} class="w-14 h-10 flex-shrink-0 bg-black/40 border border-white/20 text-center font-bold text-lg rounded-lg text-white transition focus:border-neon-blue" value="${m.score2}" onchange="updateSocialScore(${i}, 2, this.value)">
                     </div>
                     <div class="flex">
                         <button onclick="submitSocialMatch(${i})" class="flex-1 py-3 ${m.submitted?'bg-white/10 text-white/50':'btn-main'} rounded-xl font-bold text-xs uppercase" ${isSkipped ? 'disabled' : ''}>${m.submitted ? 'Locked (Edit)' : 'Lock Score'}</button>
@@ -463,11 +477,14 @@
             renderCurrentRound(); saveState();
         }
 
+        // --- STATS CALCULATION WITH SKIP SAFEGUARD ---
         function calculateSocialStats() {
             const stats = {};
             socialPlayers.forEach(p => stats[p.id] = { name: p.name, pts: 0, played: 0, w:0, l:0, d:0 });
             roundsHistory.forEach(r => r.matches.forEach(m => {
-                if (m.submitted && !m.skipped) {
+                if (m.skipped) return; // Strict safeguard to ensure skipped matches are entirely ignored
+
+                if (m.submitted) {
                     const t1 = m.team1, t2 = m.team2;
                     t1.forEach(p => { stats[p.id].pts+=m.score1; stats[p.id].played++; });
                     t2.forEach(p => { stats[p.id].pts+=m.score2; stats[p.id].played++; });
